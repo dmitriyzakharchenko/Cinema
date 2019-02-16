@@ -1,64 +1,81 @@
 import store from './data.js'
-
-store.getMovies().then(result =>{
+store.getMovies().then(result => {
     let movies = new Movies(result);
-    movies.getMovies();
     let movieView = new MovieListView(movies, document.getElementById('movie-list'));
     movieView.render();
+});
 
-})
-
-class Movies{
-    constructor(movies){
+class Movies {
+    constructor (movies) {
         this.movies = movies;
     }
-    getMovies(){
-        this.movies;
+    getMovies () {
+        return this.movies;
     }
-    getMovieById(id){
+    getMovieById(id) {
         return this.movies.find(item => item.id === id);
     }
-    addMovie(movie){
+    addMovie (movie) {
         this.movies.push(movie)
     }
 }
-class MovieListView {
-    constructor(model,el,datailsEl) {
-        this.model = model;
+
+class View {
+    constructor (el) {
         this.element = el;
-        this.datailElement = datailsEl;
-        this.element.addEventListener('click', (e) => {
+    }
+    render () {
+        return this;
+    }
+    clear () {
+        this.element.innerHTML = '';
+        return this;
+    }
+}
+// Create Class MovieView extend View
+// Change View constructor to create element if not passed
+class MovieListView extends View {
+    constructor(model, el) {
+        super(el);
+        this.model = model;
+        this.detailElement = new MovieDetailsView(this.model.getMovies()[0], document.getElementById('movie-details-view'));
+
+        this.element.addEventListener('click', (e)=> {
             const target = e.target;
             if (target.classList.contains('movie-item')) {
-                this.datailElement.setMovie(this.model.getMovies()[0],document.getElementById())
-
+                this.detailElement.setMovie(this.model.getMovieById(target.dataset.id))
             }
         });
     }
-    render(){
+    render() {
         let movies = this.model.getMovies();
-            movies.forEach(item =>{
-            let movie = document.createElement('div');
-            movie.innerHTML = `<div class="movie-item">${item.name}</div>`;
-            this.element.appendChild(movie);
-
-        })
+        movies.forEach(item => {
+            let movie = document.createElement('div'); //create el
+            movie.innerHTML = `<div data-id="${item.id}" class="movie-item">${item.name}</div>`; //set inner html
+            this.element.appendChild(movie); // add inner html to the element
+        });
+        return this;
     }
 }
-class MovieDetailsView{
-    constructor(movie,el){
-        this.movie = movie;
-        this.element = element;
-    }
-    setMovie(movie){
+class MovieDetailsView extends View {
+    constructor (movie, el) {
+        super(el);
         this.movie = movie;
     }
-    render(){
+
+    setMovie(movie) {
+        this.movie = movie;
+        this.render();
+    }
+    render () {
+        const {name, director, year} = this.movie;
+        // const name = this.movie.name;// const director = this.movie.director;// const year = this.movie.year;
         let movie = document.createElement('div');
         movie.innerHTML = `<div>title: ${name}</div>
-                           <div>year: ${year}</div>
-                           <div>director: ${director}</div>`;
-
-        this.element.appendChild(movie) ;
+                            <div>year: ${year}</div>
+                            <div>direcior: ${director}</div>`;
+        this.clear();
+        this.element.appendChild(movie);
+        return this;
     }
 }
