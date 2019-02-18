@@ -69,7 +69,6 @@ class MovieDetailsView extends View {
     }
     render () {
         const {name, director, year} = this.movie;
-        // const name = this.movie.name;// const director = this.movie.director;// const year = this.movie.year;
         let movie = document.createElement('div');
         movie.innerHTML = `<div>title: ${name}</div>
                             <div>year: ${year}</div>
